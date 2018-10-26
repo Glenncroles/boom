@@ -1,6 +1,8 @@
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -52,7 +54,7 @@ public class tests
     {
         MapData test = new MapData(year, month, day, hour, min, dir);
         test.parseFile();
-        Assert.assertEquals(test.getStatistics(StatsType.MINIMUM, "SRAD").getValue(), 31.4 , 0.1);
+        Assert.assertEquals(test.getStatistics(StatsType.MINIMUM, "SRAD").getValue(), 639.0 , 0.1);
     }
     
     
@@ -72,7 +74,7 @@ public class tests
         MapData test = new MapData(year, month, day, hour, min, dir);
         test.parseFile();
         double number = test.getStatistics(StatsType.MINIMUM, "SRAD").getValue();
-        assertEquals(number, 31.4, 0.1);
+        assertEquals(number, 639.0, 0.1);
     }
     
     
@@ -134,7 +136,8 @@ public class tests
     @Test
     public void testStatistics() throws IOException
     {
-        Statistics test = new Statistics(0.0," ", " ", 0, StatsType.AVERAGE);
+        ZonedDateTime ztd = null;
+        Statistics test = new Statistics(0.0," ", ztd, 0, StatsType.AVERAGE);
         int i = test.getNumberOfReportingStations();
         assertEquals(i, 0);
     }
@@ -154,9 +157,9 @@ public class tests
     @Test
     public void testcreateDateFromString() throws IOException
     {
-        Statistics test = new Statistics(0.0," ", "1999-09-09'T'09:09:09 z", 0, StatsType.AVERAGE);
-        String dateTimeStr = "1999-10-19'T'19:19:19 z";
         GregorianCalendar i = new GregorianCalendar(1999, 10, 19, 19, 19, 19);
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+        String dateTimeStr = "1999-10-19'T'19:19:19 z";
         int g = i.get(Calendar.YEAR);
         GregorianCalendar j = test.createDateFromString(dateTimeStr);
         int h = j.get(Calendar.YEAR);
@@ -169,20 +172,35 @@ public class tests
     @Test
     public void testcreateStringFromDate() throws IOException
     {
-        Statistics test = new Statistics(0.0," ", " ", 0, StatsType.AVERAGE);
         GregorianCalendar i = new GregorianCalendar(1999, 10, 19, 19, 19, 19);
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+        
         String j = test.createStringFromDate(i);
         String h = i.toString();
         assertEquals(j, h);
     }
     
+    /**
+    @Test
+    public void testzcreateStringFromDate() throws IOException, ParseException
+    {
+        ZonedDateTime i = ZonedDateTime.of(1999, 10, 9, 9, 9, 9, 9, ZoneId.of("Europe/Paris"));
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+         //createZDateFromString
+        String t = test.createStringFromDate(i);
+        ZonedDateTime j = test.createZDateFromString(t);
+        j.toString();
+        assertEquals(j, i);
+    }
+    **/
     
     @Test
     public void testgetNumberOfReportingStations() throws IOException
     {
-        Statistics test = new Statistics(0.0," ", " ", 0, StatsType.AVERAGE);
-        int i = test.getNumberOfReportingStations();
-        assertEquals(i, 0);
+        GregorianCalendar i = new GregorianCalendar(1999, 10, 19, 19, 19, 19);
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+        int c = test.getNumberOfReportingStations();
+        assertEquals(c, 0);
         
     }
     
@@ -190,8 +208,9 @@ public class tests
     @Test
     public void testgetUTCDateTimeString() throws IOException
     {
-        Statistics test = new Statistics(0.0," ", " ", 0, StatsType.AVERAGE);
         GregorianCalendar i = new GregorianCalendar(1999, 10, 19, 19, 19, 19);
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+        
         String j = test.createStringFromDate(i);
         String g = test.getUTCDateTimeString();
         assertEquals(j, g);
@@ -209,6 +228,15 @@ public class tests
     
     
     @Test
+    public void testznewerThan() throws IOException
+    {
+        ZonedDateTime i = ZonedDateTime.of(1999, 10, 9, 9, 9, 9, 9, ZoneId.of("Europe/Paris"));
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+        assertEquals(test.newerThan(i),false);
+    }
+    
+    
+    @Test
     public void testolderThan() throws IOException
     {
         GregorianCalendar i = new GregorianCalendar(1999, 10, 19, 19, 19, 19);
@@ -216,6 +244,14 @@ public class tests
         assertEquals(test.olderThan(i),false);
     }
     
+    
+    @Test
+    public void testzolderThan() throws IOException
+    {
+        ZonedDateTime i = ZonedDateTime.of(1999, 10, 9, 9, 9, 9, 9, ZoneId.of("Europe/Paris"));
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+        assertEquals(test.olderThan(i),false);
+    }
     
     @Test
     public void testsameAs() throws IOException
@@ -227,10 +263,21 @@ public class tests
     
     
     @Test
+    public void testzSameAs() throws IOException
+    {
+        ZonedDateTime i = ZonedDateTime.of(1999, 10, 9, 9, 9, 9, 9, ZoneId.of("Europe/Paris"));
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
+        assertEquals(test.sameAs(i),true);
+    }
+    
+    
+    @Test
     public void testStatToSting() throws IOException
     {
-        Statistics test = new Statistics(0.0," ", " ", 0, StatsType.AVERAGE);
+        GregorianCalendar i = new GregorianCalendar(1999, 10, 19, 19, 19, 19);
+        Statistics test = new Statistics(0.0," ", i, 0, StatsType.AVERAGE);
         assertEquals(test.toString(), " ");
     }
+    
 
 }
