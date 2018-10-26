@@ -78,6 +78,19 @@ public class Statistics extends Observation
         return dateTimeStr;
     }
     
+    /**
+     * creates a string from a ztd calendar
+     * @param calendar
+     * @return
+     */
+    public String createStringFromDate(ZonedDateTime calendar)
+    {
+        dateTimeStr = calendar.toString();
+        return dateTimeStr;
+    }
+    
+    
+    
     //finds out how many stations are reporting
     public int getNumberOfReportingStations()
     {
