@@ -1,3 +1,8 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class Statistics extends Observation 
@@ -5,7 +10,11 @@ public class Statistics extends Observation
 
     final protected String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss z";
     
+    protected DateTimeFormatter format;
+    
     private GregorianCalendar utcDateTime;
+    
+    private ZonedDateTime zdtDateTime;
     
     private int numberOfReportingStations;
     
@@ -16,12 +25,12 @@ public class Statistics extends Observation
  
     
     //This is a constructor that bring in a str as date and time
-    public Statistics(double value, String stid, String dateTimeStr, int numberOfValidStations, StatsType inStatType)
+    public Statistics(double value, String stid, ZonedDateTime dateTime, int numberOfValidStations, StatsType inStatType)
     {
         super(value, stid);
         statType = inStatType;
         numberOfReportingStations = numberOfValidStations;
-        this.dateTimeStr = dateTimeStr;
+        zdtDateTime = dateTime;
     }
     
     //This is a constructor that bring in a gregorianCalender as date and time
@@ -48,6 +57,19 @@ public class Statistics extends Observation
         utcDateTime = new GregorianCalendar(year, month, day, hour, min, sec);
         return utcDateTime;
     }
+    
+    
+    public ZonedDateTime createZDateFromString(String dateTimeStr) throws ParseException
+    {
+        //take the information needed from the string and store into approprate varables
+        //found a much easier way to do this on stack overflow author ssf
+        DateTimeFormatter a = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+
+        //return the new calendar 
+        return ZonedDateTime.parse(dateTimeStr, a);
+    }
+    
+    
     
     //brings in a calender date and creates a string
     public String createStringFromDate(GregorianCalendar calendar)
