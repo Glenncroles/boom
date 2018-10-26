@@ -1,8 +1,8 @@
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+
 import java.util.GregorianCalendar;
 
 public class Statistics extends Observation 
@@ -21,7 +21,7 @@ public class Statistics extends Observation
     @SuppressWarnings({ "unused" })
     private StatsType statType;
     
-    private String dateTimeStr;
+    
  
     
     //This is a constructor that bring in a str as date and time
@@ -74,7 +74,7 @@ public class Statistics extends Observation
     //brings in a calender date and creates a string
     public String createStringFromDate(GregorianCalendar calendar)
     {
-        dateTimeStr = calendar.toString();
+        String dateTimeStr = calendar.toString();
         return dateTimeStr;
     }
     
@@ -85,7 +85,7 @@ public class Statistics extends Observation
      */
     public String createStringFromDate(ZonedDateTime calendar)
     {
-        dateTimeStr = calendar.toString();
+        String dateTimeStr = calendar.toString();
         return dateTimeStr;
     }
     
@@ -100,6 +100,7 @@ public class Statistics extends Observation
     //gets the utcDateTimeStr
     public String getUTCDateTimeString()
     { 
+        String dateTimeStr = createStringFromDate(zdtDateTime);
         return dateTimeStr.toString();
     } 
     
