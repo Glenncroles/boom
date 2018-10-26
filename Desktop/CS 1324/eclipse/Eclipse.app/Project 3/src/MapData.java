@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -76,31 +76,6 @@ public class MapData
     //-utcDateTime: GregorianCalendar had to import the gregor cal
 
     private GregorianCalendar utcDateTime;
-
-    /**
-     * The year of the data.
-     */
-    private int year;
-
-    /**
-     * The month of the data.
-     */
-    private int month; 
-
-    /**
-     * The month of the data.
-     */
-    private int day;
-
-    /**
-     * The hour of the data.
-     */
-    private int hour;
-
-    /**
-     * The minute of the data.
-     */
-    private int minute;
     
     private ArrayList<Observation> split1 = new ArrayList<Observation>();
     private ArrayList<Observation> split2 = new ArrayList<Observation>();
@@ -120,14 +95,6 @@ public class MapData
         //make all the vairables usable
         utcDateTime = new GregorianCalendar(year, month, day, hour, minute);
 
-        //initalize year ect.
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.hour = hour;
-        this.minute = minute;
-        
-        
         //initialize arrays
         dataCatalog = new HashMap<>();
         paramPositions = new TreeMap<>();
@@ -217,7 +184,7 @@ public class MapData
 
         String strg;  // String containing a line of data from the file.
 
-        // TODO: Throw out header
+        // Throw out header
         strg = br.readLine();
         strg = br.readLine();
         strg = br.readLine();
@@ -228,7 +195,8 @@ public class MapData
 
 
 
-        // TODO: Read in first row containing data, create and add a Mapdata object to the array.
+        int not = 0;
+        //Read in first row containing data, create and add a Mapdata object to the array.
         while (strg != null)
         {
             
@@ -253,6 +221,12 @@ public class MapData
   
             
             
+            if(!tair.isValid())
+            {
+                not++;
+            }
+            
+            
             //call the prepareDataCatalog to put the observations in the right place
             //putting the arrayslits into dataCatalog 
             prepareDataCatalog();
@@ -266,6 +240,7 @@ public class MapData
 
             
         }
+        numberOfStations = split1.size()-not;
         
 
 
@@ -428,7 +403,9 @@ public class MapData
 
         //build the toString 
         System.out.println("=========================================================");
-        String d = String.format("=== %4d-%02d-%02d %02d:%02d ===", year, month, day, hour, minute);
+        String d = String.format("=== %4d-%02d-%02d %02d:%02d ===", utcDateTime.get(Calendar.YEAR), 
+                utcDateTime.get(Calendar.MONTH), utcDateTime.get(Calendar.DAY_OF_MONTH), 
+                utcDateTime.get(Calendar.HOUR_OF_DAY), utcDateTime.get(Calendar.MINUTE));
         System.out.println(d);
         System.out.println("=========================================================");
         System.out.println("=========================================================");
