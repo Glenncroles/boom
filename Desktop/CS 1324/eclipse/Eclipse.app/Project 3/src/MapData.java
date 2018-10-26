@@ -77,9 +77,7 @@ public class MapData
 
     private GregorianCalendar utcDateTime;
     
-    private ArrayList<Observation> split1 = new ArrayList<Observation>();
-    private ArrayList<Observation> split2 = new ArrayList<Observation>();
-    private ArrayList<Observation> split3 = new ArrayList<Observation>();
+    
 
     /**
      * MapData will read in the day of the data from a text file 
@@ -96,12 +94,12 @@ public class MapData
         utcDateTime = new GregorianCalendar(year, month, day, hour, minute);
 
         //initialize arrays
-        dataCatalog = new HashMap<>();
-        paramPositions = new TreeMap<>();
+        dataCatalog = new HashMap<String,ArrayList<Observation> >();
+        paramPositions = new TreeMap<String,Integer>();
 
         numberOfStations = 116;
         fileName = createFileName(year, month, day, hour, minute, directory);
-        parseParamHeader(fileName);
+        
 
     }
 
@@ -137,25 +135,7 @@ public class MapData
 
         for(Integer i = 0; i < split.length; i++)
         {
-            if(split[i].equalsIgnoreCase(SRAD))
-            {
-                paramPositions.put(SRAD, i);
-            }
-
-            if(split[i].equalsIgnoreCase(TAIR))
-            {
-                paramPositions.put(TAIR, i);
-            }
-
-            if(split[i].equalsIgnoreCase(TA9M))
-            {
-                paramPositions.put(TA9M, i);
-            }
-
-            if(split[i].equalsIgnoreCase(STID))
-            {
-                paramPositions.put(STID, i);
-            }
+            paramPositions.put(split[i], i);
         }
     }
     
@@ -194,8 +174,11 @@ public class MapData
         strg = br.readLine();
 
 
+        //call the prepareDataCatalog to put the observations in the right place
+        //putting the arrayslits into dataCatalog 
+        prepareDataCatalog();
 
-        int not = 0;
+        
         //Read in first row containing data, create and add a Mapdata object to the array.
         while (strg != null)
         {
@@ -204,32 +187,16 @@ public class MapData
             //creating a string array to hold the lines data
             String[] split = strg.trim().split("\\s+");
             
-
-
-            //creating a new observation srad to hold the data doing the same for the others
-            Observation srad = new Observation(Double.parseDouble(split[paramPositions.get(SRAD)]), split[paramPositions.get(STID)]); 
-            split1.add(srad);
             
-
-            Observation tair = new Observation(Double.parseDouble(split[paramPositions.get(TAIR)]), split[paramPositions.get(STID)]);
-            split2.add(tair);
-            
-            
-
-            Observation ta9m = new Observation(Double.parseDouble(split[paramPositions.get(TA9M)]), split[paramPositions.get(STID)]);
-            split3.add(ta9m);
-  
-            
-            
-            if(!tair.isValid())
+            Set<String> parameterIds = paramPositions.keySet();
+            for(String paramId: parameterIds)
             {
-                not++;
+                if(!paramId.equalsIgnoreCase(STID))
+                {
+                    dataCatalog.get(paramId).add(new Observation(Double.parseDouble(split[getIndexOf(paramId)]), split[getIndexOf(STID)]));
+                }
             }
-            
-            
-            //call the prepareDataCatalog to put the observations in the right place
-            //putting the arrayslits into dataCatalog 
-            prepareDataCatalog();
+
             
             //call the calculateStatics method to caluculate all the stats
             calculateStatistics();
@@ -240,7 +207,7 @@ public class MapData
 
             
         }
-        numberOfStations = split1.size()-not;
+        
         
 
 
@@ -266,7 +233,7 @@ public class MapData
      */
     private void calculateAllStatistics()
     {
-        statistics = new EnumMap<>(StatsType.class);
+        statistics = new EnumMap<StatsType, TreeMap<String, Statistics>>(StatsType.class);
         
         //create TreeMaps for storing the new stats 
         TreeMap<String, Statistics> treeMin = new TreeMap<>();
@@ -274,17 +241,9 @@ public class MapData
         TreeMap<String, Statistics> treeTtl = new TreeMap<>();
         TreeMap<String, Statistics> treeAvg = new TreeMap<>();
 
-        //need a min, max, total, and average
-        double min = 10000000000000000000000000000000.0;
-        double max = -10000000000000000000000000000000.00;
-        double total = 0;
-        double average = 0;
         
-        //temp for both min and max to put the values into to test against
-        String minTemp = null;
-        String maxTemp = null;
         
-        Set<String> parameterIds = dataCatalog.keySet();
+        Set<String> parameterIds = paramPositions.keySet();
         
         ArrayList<Observation> data;
         
@@ -292,6 +251,16 @@ public class MapData
         for(String paramId: parameterIds)
         {
         
+          //need a min, max, total, and average
+            double min = 10000000000000000000000000000000.0;
+            double max = -10000000000000000000000000000000.00;
+            double total = 0;
+            double average = 0;
+            
+            //temp for both min and max to put the values into to test against
+            String minTemp = null;
+            String maxTemp = null;
+            
         //Arraylist for the data hence the name
         data = dataCatalog.get(paramId);
         
@@ -305,21 +274,21 @@ public class MapData
             
             
             //finds the min value
-            if(stats.getValue() < min && stats.isValid() && stats != null)
+            if(stats.getValue() < min && stats.isValid())
             {
                 min = stats.getValue();
                 minTemp = stats.getStid();
             }
             
             //finds the max value
-            else if(stats.getValue() > max && stats.isValid() && stats != null)
+            else if(stats.getValue() > max && stats.isValid())
             {
                 max = stats.getValue();
                 maxTemp = stats.getStid();
             }
             
             //adds the total if the value is valid
-            if(stats.isValid() && stats != null)
+            if(stats.isValid())
             {
                 total += stats.getValue();
                 
@@ -328,7 +297,7 @@ public class MapData
             
         }  
         }
-        numberOfStations = data.size();
+        
         //compute the average
         average = total/numberOfStations;
         
@@ -362,10 +331,13 @@ public class MapData
     
     private void prepareDataCatalog()
     {
-      //putting the arrayslits into dataCatalog 
-        dataCatalog.put(SRAD,split1);
-        dataCatalog.put(TAIR,split2);
-        dataCatalog.put(TA9M,split3);
+        
+        Set<String> parameterIds = paramPositions.keySet();
+        for(String paramId: parameterIds)
+        {
+            dataCatalog.put(paramId, new ArrayList<Observation>());
+        }
+      
     }
     
 
