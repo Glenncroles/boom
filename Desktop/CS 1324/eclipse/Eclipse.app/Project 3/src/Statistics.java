@@ -122,6 +122,26 @@ public class Statistics extends Observation
         return utcDateTime.equals(inDateTime);
     }
     
+    //Finds out if your date is newer than the old date
+    public boolean newerThan(ZonedDateTime inDateTime)
+    {
+        return zdtDateTime.isBefore(inDateTime);
+    } 
+    
+    //Finds out if your date is older than the old date
+    public boolean olderThan(ZonedDateTime inDateTime)
+    {
+        
+        return zdtDateTime.isAfter(inDateTime);
+    }
+    
+    //Finds out if your date is the same as the old date
+    
+    public boolean sameAs(ZonedDateTime inDateTime)
+    {
+        return zdtDateTime.equals(inDateTime);
+    }
+    
     //dont know what we need to print here
     public String toString()
     {
