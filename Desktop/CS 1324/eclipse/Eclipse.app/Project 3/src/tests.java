@@ -67,6 +67,16 @@ public class tests
     
     
     @Test
+    public void testgetStatistics() throws IOException
+    {
+        MapData test = new MapData(year, month, day, hour, min, dir);
+        test.parseFile();
+        double number = test.getStatistics(StatsType.MINIMUM, "SRAD").getValue();
+        assertEquals(number, 31.4, 0.1);
+    }
+    
+    
+    @Test
     public void testObservation()
     {
         Observation test = new Observation(0, null);
