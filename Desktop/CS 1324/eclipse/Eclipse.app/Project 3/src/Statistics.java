@@ -100,7 +100,7 @@ public class Statistics extends Observation
     //gets the utcDateTimeStr
     public String getUTCDateTimeString()
     { 
-        String dateTimeStr = createStringFromDate(zdtDateTime);
+        String dateTimeStr = createStringFromDate(utcDateTime);
         return dateTimeStr.toString();
     } 
     
