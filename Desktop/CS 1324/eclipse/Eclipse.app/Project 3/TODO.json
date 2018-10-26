@@ -1,0 +1,23 @@
+{
+	"Lab Section": 12,
+	"Last Modified": "2018-09-11",
+	"OU ID": 112917922,
+	"OU EMAIL": "coy@ou.edu",
+	"Tasks": [{
+				"Description": "Change MapData class to hashmap enummap and treemap",
+				"Estimated Time (Minutes)": 75,
+				"Actual Time (Minutes)": 150
+			},
+			{
+				"Description": "Change DateTimeComparable class to include ZonedDateTime",
+				"Estimated Time (Minutes)": 5,
+				"Actual Time (Minutes)": 1
+			},
+			{
+				"Description": "Change Statistics class to ZonedDateTime",
+				"Estimated Time (Minutes)": 75,
+				"Actual Time (Minutes)": 100
+			}
+			
+]
+}
